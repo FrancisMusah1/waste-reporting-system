@@ -1,3 +1,4 @@
+const upload = require("./cloudinary");
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
@@ -84,6 +85,64 @@ app.post("/login", async (req, res) => {
     token,
     user: { id: user.id, name: user.name, email: user.email, role: user.role },
   });
+});
+
+app.post("/reports", requireAuth, upload.single("photo"), async (req, res) => {
+  const { category, description, location, latitude, longitude } = req.body;
+  const userId = req.user.userId;
+
+  const photoUrl = req.file ? req.file.path : null;
+
+  const result = await pool.query(
+    `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [userId, category, description, location, latitude || null, longitude || null, photoUrl]
+  );
+
+  res.json({ message: "Report submitted!", report: result.rows[0] });
+});
+
+app.get("/reports", requireAuth, requireAdmin, async (req, res) => {
+  const result = await pool.query(
+    `SELECT reports.*, users.name AS reporter_name
+     FROM reports
+     JOIN users ON reports.user_id = users.id
+     ORDER BY reports.created_at DESC`
+  );
+
+  res.json(result.rows);
+});
+
+app.get("/my-reports", requireAuth, async (req, res) => {
+  const userId = req.user.userId;
+
+  const result = await pool.query(
+    "SELECT * FROM reports WHERE user_id = $1 ORDER BY created_at DESC",
+    [userId]
+  );
+
+  res.json(result.rows);
+});
+
+app.patch("/reports/:id/status", requireAuth, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = ["pending", "in_progress", "resolved"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  const result = await pool.query(
+    "UPDATE reports SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+    [status, id]
+  );
+
+  if (result.rows.length === 0) {
+    return res.status(404).json({ message: "Report not found" });
+  }
+
+  res.json({ message: "Status updated!", report: result.rows[0] });
 });
 
 app.listen(3000, () => {
