@@ -26,7 +26,7 @@ function hideError() {
   errorBox.classList.add("d-none");
 }
 
-const API_URL = "http://localhost:3000";
+const API_URL = "";
 
 // Handle login form submission
 document.getElementById("loginForm").addEventListener("submit", async (e) => {

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = "";
 
 // Get the logged-in user's info from localStorage
 const token = localStorage.getItem("token");
