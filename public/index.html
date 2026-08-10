@@ -9,18 +9,71 @@
 </head>
 <body>
 
+  <!-- Top navigation bar, shown on every page -->
   <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-      <span class="navbar-brand mb-0 h1">Smart Waste Reporting</span>
+      <span class="navbar-brand mb-0 h1">🌊 Smart Waste Reporting</span>
     </div>
   </nav>
 
-  <div class="container mt-5">
+  
+  <div id="landing-view">
+
+    <!-- Hero section: headline, short pitch, and the main call-to-action -->
+    <div class="hero-section text-center text-white py-5">
+      <div class="container py-5">
+        <h1 class="display-5 fw-bold">Help Keep Accra's Drains Clear</h1>
+        <p class="lead mb-4">
+          Report blocked gutters, illegal dumping, and overflowing bins in your
+          neighbourhood — with a photo and exact location — so sanitation teams
+          can act before the next flood.
+        </p>
+        <button id="getStartedBtn" class="btn btn-light btn-lg px-4">Get Started</button>
+      </div>
+    </div>
+
+    <!-- Three-step explanation of how the platform works -->
+    <div class="container py-5">
+      <h2 class="text-center mb-5">How It Works</h2>
+      <div class="row text-center">
+        <div class="col-md-4 mb-4">
+          <div class="p-4">
+            <div class="display-4 mb-3">📸</div>
+            <h5>1. Report an Issue</h5>
+            <p class="text-muted">Take a photo of the problem, add a description, and your location is captured automatically.</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="p-4">
+            <div class="display-4 mb-3">🗺️</div>
+            <h5>2. Officials Are Notified</h5>
+            <p class="text-muted">Sanitation officials see your report on their dashboard, along with others across the city.</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="p-4">
+            <div class="display-4 mb-3">✅</div>
+            <h5>3. Track Resolution</h5>
+            <p class="text-muted">Follow your report's status from Pending to In Progress to Resolved.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+ 
+  <div id="auth-view" class="container mt-5 d-none">
     <div class="row justify-content-center">
       <div class="col-md-5">
 
+        <!-- Lets a visitor return to the landing page without logging in -->
+        <button id="backToLanding" class="btn btn-link mb-3">← Back</button>
+
+        <!-- Shows login/signup error messages (wrong password, email taken, etc.) -->
         <div id="auth-error" class="alert alert-danger d-none"></div>
 
+        <!-- LOGIN FORM (visible by default within this view) -->
         <div id="login-form">
           <h3 class="mb-3">Log In</h3>
           <form id="loginForm">
@@ -39,6 +92,7 @@
           </p>
         </div>
 
+        <!-- SIGNUP FORM (hidden by default, toggled on via "Sign up" link above) -->
         <div id="signup-form" class="d-none">
           <h3 class="mb-3">Sign Up</h3>
           <form id="signupForm">

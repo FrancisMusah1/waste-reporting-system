@@ -5,6 +5,24 @@ const showSignup = document.getElementById("showSignup");
 const showLogin = document.getElementById("showLogin");
 const errorBox = document.getElementById("auth-error");
 
+// References to the two main "views" on the landing page:
+// landingView = hero section + how-it-works (shown by default)
+// authView = login/signup forms (hidden until "Get Started" is clicked)
+const landingView = document.getElementById("landing-view");
+const authView = document.getElementById("auth-view");
+
+// Clicking "Get Started" hides the marketing content and reveals the auth forms
+document.getElementById("getStartedBtn").addEventListener("click", () => {
+  landingView.classList.add("d-none");
+  authView.classList.remove("d-none");
+});
+
+// "Back" link lets a visitor return to the landing page without logging in
+document.getElementById("backToLanding").addEventListener("click", () => {
+  authView.classList.add("d-none");
+  landingView.classList.remove("d-none");
+});
+
 showSignup.addEventListener("click", (e) => {
   e.preventDefault();
   loginForm.classList.add("d-none");

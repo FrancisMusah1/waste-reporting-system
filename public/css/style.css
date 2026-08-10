@@ -5,3 +5,7 @@ body {
   .navbar-brand {
     font-weight: 600;
   }
+
+  .hero-section {
+    background: linear-gradient(135deg, #0d47a1, #1976d2);
+  }
