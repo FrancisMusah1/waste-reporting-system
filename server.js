@@ -36,6 +36,7 @@ function requireAdmin(req, res, next) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
