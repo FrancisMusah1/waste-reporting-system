@@ -1,8 +1,8 @@
-/* ==========================================================================
+/* 
    DESIGN TOKENS
    Green-dominant palette, fitting environmental sanitation / waste
    management — distinct from generic blue "tech startup" defaults.
-   ========================================================================== */
+   */
 
    :root {
     --forest-green: #1b5e3a;
@@ -26,9 +26,9 @@
     color: var(--text-dark);
   }
   
-  /* ==========================================================================
+  /* 
      NAVBAR
-     ========================================================================== */
+     */
   
   .navbar {
     background-color: var(--forest-green-dark) !important;
@@ -40,9 +40,9 @@
     font-size: 1.3rem;
   }
   
-  /* ==========================================================================
+  /* 
      HERO SECTION
-     ========================================================================== */
+      */
   
   .hero-section {
     background: linear-gradient(135deg, var(--forest-green-dark), var(--forest-green));
@@ -107,9 +107,9 @@
     margin-top: 4px;
   }
   
-  /* ==========================================================================
+  /* 
      HOW IT WORKS SECTION
-     ========================================================================== */
+      */
   
      .how-it-works {
       background-color: var(--bg-light);
@@ -172,10 +172,10 @@
       margin-bottom: 10px;
     }
   
-  /* ==========================================================================
+  /* 
      WHY IT MATTERS SECTION
-     Ties the app directly back to the flood-prevention problem statement.
-     ========================================================================== */
+    
+      */
   
   .why-section {
     background-color: var(--forest-green-dark);
@@ -239,3 +239,70 @@
   .btn-primary:hover {
     background-color: var(--forest-green-dark);
   }
+
+  /* 
+   REPORT CARDS (citizen + admin dashboards)
+    */
+
+#reportsList .card {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(27, 94, 58, 0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+#reportsList .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(27, 94, 58, 0.16);
+}
+
+#reportsList .card-title {
+  color: var(--forest-green-dark);
+  font-weight: 700;
+}
+
+/* Status dropdown on admin card
+ */
+.status-select {
+  border-radius: 8px;
+  border: 1px solid #cfd8d2;
+}
+
+/* 
+   ADMIN STAT CARDS
+    */
+
+.card.text-center {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(27, 94, 58, 0.08);
+}
+
+.card.text-center h3 {
+  color: var(--forest-green-dark);
+  font-weight: 800;
+}
+
+/* 
+   FORM CONTROLS (report submission form, filters)
+    */
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--leaf-green);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+}
+
+/* 
+   CARD (report submission form container on citizen.html)
+   */
+
+.card {
+  border-radius: 14px;
+}
+
+.card .card-title {
+  color: var(--forest-green-dark);
+  font-weight: 700;
+}
