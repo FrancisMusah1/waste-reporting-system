@@ -10,71 +10,120 @@
 <body>
 
   <!-- Top navigation bar, shown on every page -->
-  <nav class="navbar navbar-dark bg-dark">
+  <nav class="navbar navbar-dark">
     <div class="container">
-      <span class="navbar-brand mb-0 h1">🌊 Smart Waste Reporting</span>
+      <span class="navbar-brand mb-0 h1">🌿 Smart Waste Reporting</span>
     </div>
   </nav>
 
-  
+  <!-- 
+       LANDING VIEW
+       Shown by default. Explains the problem, the solution, and how the
+       platform works before asking a visitor to create an account.
+       -->
   <div id="landing-view">
 
-    <!-- Hero section: headline, short pitch, and the main call-to-action -->
-    <div class="hero-section text-center text-white py-5">
-      <div class="container py-5">
-        <h1 class="display-5 fw-bold">Help Keep Accra's Drains Clear</h1>
-        <p class="lead mb-4">
+    <!-- HERO: headline, pitch, call-to-action, and a stat counter row -->
+    <div class="hero-section text-center text-white">
+      <div class="container">
+        <h1>Help Keep Accra's Drains Clear Before the Next Flood</h1>
+        <p class="lead">
           Report blocked gutters, illegal dumping, and overflowing bins in your
           neighbourhood — with a photo and exact location — so sanitation teams
-          can act before the next flood.
+          can act before storm water has nowhere to go.
         </p>
-        <button id="getStartedBtn" class="btn btn-light btn-lg px-4">Get Started</button>
+        <button id="getStartedBtn" class="btn btn-hero">Get Started</button>
+
+        <!-- Stat counters, mirroring the credibility pattern used by real
+             sanitation organisations like Zoomlion Ghana -->
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-number">3</div>
+            <div class="stat-label">Report Categories</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Reporting Available</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">Live</div>
+            <div class="stat-label">Status Tracking</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Three-step explanation of how the platform works -->
-    <div class="container py-5">
-      <h2 class="text-center mb-5">How It Works</h2>
-      <div class="row text-center">
-        <div class="col-md-4 mb-4">
-          <div class="p-4">
-            <div class="display-4 mb-3">📸</div>
-            <h5>1. Report an Issue</h5>
-            <p class="text-muted">Take a photo of the problem, add a description, and your location is captured automatically.</p>
+    <!-- HOW IT WORKS: three-step explanation, each with a numbered badge
+         and an icon in a colored circle for real visual weight -->
+    <div class="how-it-works">
+      <div class="container">
+        <h2 class="text-center mb-5" style="color: var(--forest-green-dark); font-weight: 700;">
+          How It Works
+        </h2>
+        <div class="row text-center">
+
+          <div class="col-md-4 mb-4">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <div class="step-icon">📸</div>
+              <h5>Report an Issue</h5>
+              <p class="text-muted">Take a photo, add a short description, and your location is captured automatically.</p>
+            </div>
           </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="p-4">
-            <div class="display-4 mb-3">🗺️</div>
-            <h5>2. Officials Are Notified</h5>
-            <p class="text-muted">Sanitation officials see your report on their dashboard, along with others across the city.</p>
+
+          <div class="col-md-4 mb-4">
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <div class="step-icon">🗺️</div>
+              <h5>Officials Are Notified</h5>
+              <p class="text-muted">Sanitation officials see your report on a live dashboard, alongside others across the city.</p>
+            </div>
           </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="p-4">
-            <div class="display-4 mb-3">✅</div>
-            <h5>3. Track Resolution</h5>
-            <p class="text-muted">Follow your report's status from Pending to In Progress to Resolved.</p>
+
+          <div class="col-md-4 mb-4">
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <div class="step-icon">✅</div>
+              <h5>Track Resolution</h5>
+              <p class="text-muted">Follow your report's status from Pending to In Progress to Resolved.</p>
+            </div>
           </div>
+
         </div>
+      </div>
+    </div>
+
+    <!-- WHY IT MATTERS: ties the platform directly to the flood-prevention
+         problem statement from the project proposal -->
+    <div class="why-section">
+      <div class="container">
+        <h2>Why This Matters</h2>
+        <p>
+          Blocked gutters and illegal dumping are a leading cause of urban flooding
+          in Accra. Every report submitted here gives sanitation officials the
+          information they need — where the problem is, what it looks like, and
+          when it was found — to act before the next heavy rain.
+        </p>
       </div>
     </div>
 
   </div>
 
- 
+  <!-- 
+       AUTH VIEW
+       Hidden until "Get Started" is clicked. Contains login and signup forms;
+       only one is visible at a time, toggled by auth.js.
+       -->
   <div id="auth-view" class="container mt-5 d-none">
     <div class="row justify-content-center">
       <div class="col-md-5">
 
-        <!-- Lets a visitor return to the landing page without logging in -->
         <button id="backToLanding" class="btn btn-link mb-3">← Back</button>
 
-        <!-- Shows login/signup error messages (wrong password, email taken, etc.) -->
         <div id="auth-error" class="alert alert-danger d-none"></div>
 
-        <!-- LOGIN FORM (visible by default within this view) -->
-        <div id="login-form">
+        <!-- LOGIN FORM -->
+        <div id="login-form" class="auth-box">
           <h3 class="mb-3">Log In</h3>
           <form id="loginForm">
             <div class="mb-3">
@@ -92,8 +141,8 @@
           </p>
         </div>
 
-        <!-- SIGNUP FORM (hidden by default, toggled on via "Sign up" link above) -->
-        <div id="signup-form" class="d-none">
+        <!-- SIGNUP FORM -->
+        <div id="signup-form" class="auth-box d-none">
           <h3 class="mb-3">Sign Up</h3>
           <form id="signupForm">
             <div class="mb-3">

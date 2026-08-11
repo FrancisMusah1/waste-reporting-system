@@ -1,11 +1,215 @@
-body {
-    background-color: #f4f6f8;
+/* ==========================================================================
+   DESIGN TOKENS
+   Green-dominant palette, fitting environmental sanitation / waste
+   management — distinct from generic blue "tech startup" defaults.
+   ========================================================================== */
+
+   :root {
+    --forest-green: #1b5e3a;
+    --forest-green-dark: #123d26;
+    --leaf-green: #4caf50;
+    --amber: #f4a825;
+    --surface: #ffffff;
+    --bg-light: #f4f7f5;
+    --text-dark: #1a2e22;
+    --text-muted: #6b7d72;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+  }
+  
+  /* ==========================================================================
+     NAVBAR
+     ========================================================================== */
+  
+  .navbar {
+    background-color: var(--forest-green-dark) !important;
+    padding: 16px 0;
   }
   
   .navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  
+  /* ==========================================================================
+     HERO SECTION
+     ========================================================================== */
+  
+  .hero-section {
+    background: linear-gradient(135deg, var(--forest-green-dark), var(--forest-green));
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-section h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    max-width: 700px;
+    margin: 0 auto 20px;
+  }
+  
+  .hero-section .lead {
+    max-width: 600px;
+    margin: 0 auto 32px;
+    opacity: 0.92;
+    font-size: 1.1rem;
+  }
+  
+  .btn-hero {
+    background-color: var(--amber);
+    color: var(--text-dark);
+    font-weight: 700;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  
+  .btn-hero:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  
+  /* Stat counter row beneath the hero pitch */
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+  }
+  
+  .stat-item {
+    text-align: center;
+  }
+  
+  .stat-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--amber);
+    line-height: 1;
+  }
+  
+  .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+  
+  /* ==========================================================================
+     HOW IT WORKS SECTION
+     ========================================================================== */
+  
+     .how-it-works {
+      background-color: var(--bg-light);
+      padding: 80px 0;
+    }
+    
+    /* Actual card styling: white surface, shadow, and a subtle hover lift
+       so this section doesn't feel flat against the green sections above/below */
+    .step-card {
+      background-color: var(--surface);
+      border-radius: 16px;
+      padding: 36px 28px;
+      height: 100%;
+      box-shadow: 0 8px 24px rgba(27, 94, 58, 0.08);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .step-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(27, 94, 58, 0.14);
+    }
+    
+    /* Numbered badge in the top-left corner of each card, reinforcing the
+       step order at a glance */
+    .step-number {
+      position: absolute;
+      top: -14px;
+      left: 24px;
+      background-color: var(--amber);
+      color: var(--text-dark);
+      font-weight: 800;
+      font-size: 0.9rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Colored circular background behind each emoji icon, instead of a
+       floating emoji with no visual weight */
+    .step-icon {
+      width: 72px;
+      height: 72px;
+      background-color: rgba(27, 94, 58, 0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 20px;
+    }
+    
+    .step-card h5 {
+      font-weight: 700;
+      color: var(--forest-green-dark);
+      margin-bottom: 10px;
+    }
+  
+  /* ==========================================================================
+     WHY IT MATTERS SECTION
+     Ties the app directly back to the flood-prevention problem statement.
+     ========================================================================== */
+  
+  .why-section {
+    background-color: var(--forest-green-dark);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+  }
+  
+  .why-section h2 {
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  
+  .why-section p {
+    max-width: 650px;
+    margin: 0 auto;
+    opacity: 0.9;
+  }
+  
+  /* ==========================================================================
+     AUTH FORMS
+     ========================================================================== */
+  
+  .auth-box {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  
+  .btn-primary {
+    background-color: var(--forest-green);
+    border: none;
     font-weight: 600;
   }
-
-  .hero-section {
-    background: linear-gradient(135deg, #0d47a1, #1976d2);
+  
+  .btn-primary:hover {
+    background-color: var(--forest-green-dark);
   }
