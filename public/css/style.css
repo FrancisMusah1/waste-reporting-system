@@ -306,3 +306,59 @@
   color: var(--forest-green-dark);
   font-weight: 700;
 }
+
+/* 
+   THEMED LINKS
+    */
+
+   .btn-link,
+   .auth-box a {
+     color: var(--forest-green);
+     text-decoration: none;
+     font-weight: 600;
+   }
+   
+   .btn-link:hover,
+   .auth-box a:hover {
+     color: var(--forest-green-dark);
+     text-decoration: underline;
+   }
+   
+   /* 
+      PASSWORD FIELD (show/hide toggle + strength meter)
+       */
+   
+   .password-wrapper {
+     position: relative;
+   }
+   
+   .password-toggle {
+     position: absolute;
+     right: 12px;
+     top: 50%;
+     transform: translateY(-50%);
+     cursor: pointer;
+     color: var(--text-muted);
+     font-size: 0.85rem;
+     user-select: none;
+   }
+   
+   .strength-meter {
+     height: 6px;
+     border-radius: 3px;
+     background-color: #e0e0e0;
+     margin-top: 8px;
+     overflow: hidden;
+   }
+   
+   .strength-meter-fill {
+     height: 100%;
+     width: 0%;
+     transition: width 0.2s ease, background-color 0.2s ease;
+   }
+   
+   .strength-label {
+     font-size: 0.8rem;
+     margin-top: 4px;
+     color: var(--text-muted);
+   }

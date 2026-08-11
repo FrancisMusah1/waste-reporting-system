@@ -106,3 +106,63 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
   loginForm.classList.remove("d-none");
   showError("Account created! Please log in.");
 });
+
+
+// PASSWORD VISIBILITY TOGGLES
+
+
+function setupPasswordToggle(inputId, toggleId) {
+  const input = document.getElementById(inputId);
+  const toggle = document.getElementById(toggleId);
+
+  toggle.addEventListener("click", () => {
+    if (input.type === "password") {
+      input.type = "text";
+      toggle.textContent = "Hide";
+    } else {
+      input.type = "password";
+      toggle.textContent = "Show";
+    }
+  });
+}
+
+setupPasswordToggle("loginPassword", "toggleLoginPassword");
+setupPasswordToggle("signupPassword", "toggleSignupPassword");
+
+
+// PASSWORD STRENGTH METER (signup only)
+// Gives the user real-time feedback so they choose a stronger password
+
+
+function checkPasswordStrength(password) {
+  let score = 0;
+
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++; // has an uppercase letter
+  if (/[0-9]/.test(password)) score++; // has a number
+  if (/[^A-Za-z0-9]/.test(password)) score++; // has a symbol
+
+  return score; // 0 (empty/very weak) to 5 (very strong)
+}
+
+document.getElementById("signupPassword").addEventListener("input", (e) => {
+  const score = checkPasswordStrength(e.target.value);
+  const fill = document.getElementById("strengthFill");
+  const label = document.getElementById("strengthLabel");
+
+  // Map the 0-5 score to a percentage width, a color, and a readable label
+  const levels = [
+    { width: "0%", color: "#e0e0e0", text: "" },
+    { width: "20%", color: "#e53935", text: "Very weak" },
+    { width: "40%", color: "#fb8c00", text: "Weak" },
+    { width: "60%", color: "#fdd835", text: "Fair" },
+    { width: "80%", color: "#7cb342", text: "Good" },
+    { width: "100%", color: "#2e7d32", text: "Strong" },
+  ];
+
+  const level = levels[score];
+  fill.style.width = level.width;
+  fill.style.backgroundColor = level.color;
+  label.textContent = level.text;
+});

@@ -16,7 +16,7 @@
     </div>
   </nav>
 
-  <!-- 
+  <!--
        LANDING VIEW
        Shown by default. Explains the problem, the solution, and how the
        platform works before asking a visitor to create an account.
@@ -109,13 +109,12 @@
 
   </div>
 
-  <!-- 
+  <!--
        AUTH VIEW
        Hidden until "Get Started" is clicked. Contains login and signup forms;
        only one is visible at a time, toggled by auth.js.
        -->
-    
-     <div id="auth-view" class="d-none" style="background-color: var(--bg-light); min-height: 90vh; padding-top: 40px;">
+  <div id="auth-view" class="d-none" style="background-color: var(--bg-light); min-height: 90vh; padding-top: 40px;">
     <div class="row justify-content-center">
       <div class="col-md-5">
 
@@ -133,7 +132,10 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" required>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="loginPassword" required>
+                <span class="password-toggle" id="toggleLoginPassword">Show</span>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary w-100">Log In</button>
           </form>
@@ -156,7 +158,15 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
-              <input type="password" class="form-control" id="signupPassword" required>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="signupPassword" required>
+                <span class="password-toggle" id="toggleSignupPassword">Show</span>
+              </div>
+              <!-- Live strength meter, updated as the user types -->
+              <div class="strength-meter">
+                <div class="strength-meter-fill" id="strengthFill"></div>
+              </div>
+              <div class="strength-label" id="strengthLabel"></div>
             </div>
             <button type="submit" class="btn btn-primary w-100">Sign Up</button>
           </form>
