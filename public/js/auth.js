@@ -210,3 +210,89 @@ document.getElementById("signupPassword").addEventListener("input", (e) => {
   fill.style.backgroundColor = level.color;
   label.textContent = level.text;
 });
+
+// ==========================================================================
+// MAP VIEW
+// Plots every report on an interactive map using Leaflet.js, with pin
+// color matching status, and a popup showing report details on click.
+// ==========================================================================
+
+let map = null; // holds the Leaflet map instance once created
+let markers = []; // holds every pin currently on the map, so we can clear them
+
+function initMap() {
+  // Only create the map once — Leaflet errors if you try to initialize
+  // a map on the same container twice
+  if (map) return;
+
+  // Center the map on Accra, Ghana, at a reasonable zoom level
+  map = L.map("reportsMap").setView([5.6037, -0.187], 12);
+
+  // Add the actual visual map tiles, from OpenStreetMap (free, no API key)
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+  }).addTo(map);
+}
+
+function plotReportsOnMap(reports) {
+  initMap();
+
+  // Clear any existing pins before plotting the current filtered set
+  markers.forEach((marker) => map.removeLayer(marker));
+  markers = [];
+
+  const statusColors = {
+    pending: "#f4a825",
+    in_progress: "#1976d2",
+    resolved: "#2e7d32",
+  };
+
+  reports.forEach((report) => {
+    // Skip any report that doesn't have real coordinates
+    if (!report.latitude || !report.longitude) return;
+
+    const color = statusColors[report.status] || "#666";
+
+    // A custom circular marker, colored by status, instead of Leaflet's
+    // default blue pin — keeps the map visually consistent with the
+    // status badges used elsewhere in the dashboard
+    const icon = L.divIcon({
+      className: "",
+      html: `<div style="background-color:${color}; width:18px; height:18px; border-radius:50%; border:3px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [18, 18],
+    });
+
+    const marker = L.marker([report.latitude, report.longitude], { icon }).addTo(map);
+
+    // Popup content shown when the pin is clicked
+    marker.bindPopup(`
+      <strong>${report.category}</strong><br>
+      ${report.description}<br>
+      <small class="text-muted">${report.location}</small><br>
+      <span class="badge" style="background-color:${color};">${report.status.replace("_", " ")}</span>
+    `);
+
+    markers.push(marker);
+  });
+}
+
+// LIST/MAP VIEW TOGGLE
+
+document.getElementById("showListBtn").addEventListener("click", () => {
+  document.getElementById("reportsList").classList.remove("d-none");
+  document.getElementById("mapView").classList.add("d-none");
+  document.getElementById("showListBtn").classList.replace("btn-outline-primary", "btn-primary");
+  document.getElementById("showMapBtn").classList.replace("btn-primary", "btn-outline-primary");
+});
+
+document.getElementById("showMapBtn").addEventListener("click", () => {
+  document.getElementById("reportsList").classList.add("d-none");
+  document.getElementById("mapView").classList.remove("d-none");
+  document.getElementById("showMapBtn").classList.replace("btn-outline-primary", "btn-primary");
+  document.getElementById("showListBtn").classList.replace("btn-primary", "btn-outline-primary");
+
+  // Leaflet needs to recalculate its size after becoming visible,
+  // since it can't measure a hidden (display:none) container correctly
+  plotReportsOnMap(allReports);
+  setTimeout(() => map.invalidateSize(), 100);
+});
