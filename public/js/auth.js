@@ -276,23 +276,45 @@ function plotReportsOnMap(reports) {
   });
 }
 
-// LIST/MAP VIEW TOGGLE
 
-document.getElementById("showListBtn").addEventListener("click", () => {
-  document.getElementById("reportsList").classList.remove("d-none");
-  document.getElementById("mapView").classList.add("d-none");
-  document.getElementById("showListBtn").classList.replace("btn-outline-primary", "btn-primary");
-  document.getElementById("showMapBtn").classList.replace("btn-primary", "btn-outline-primary");
-});
+// PUBLIC MAP (landing page)
 
-document.getElementById("showMapBtn").addEventListener("click", () => {
-  document.getElementById("reportsList").classList.add("d-none");
-  document.getElementById("mapView").classList.remove("d-none");
-  document.getElementById("showMapBtn").classList.replace("btn-outline-primary", "btn-primary");
-  document.getElementById("showListBtn").classList.replace("btn-primary", "btn-outline-primary");
+function initPublicMap() {
+  const map = L.map("publicMap").setView([5.6037, -0.187], 12);
 
-  // Leaflet needs to recalculate its size after becoming visible,
-  // since it can't measure a hidden (display:none) container correctly
-  plotReportsOnMap(allReports);
-  setTimeout(() => map.invalidateSize(), 100);
-});
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+  }).addTo(map);
+
+  fetch("/public-reports")
+    .then((res) => res.json())
+    .then((reports) => {
+      const statusColors = {
+        pending: "#f4a825",
+        in_progress: "#1976d2",
+        resolved: "#2e7d32",
+      };
+
+      reports.forEach((report) => {
+        if (!report.latitude || !report.longitude) return;
+
+        const color = statusColors[report.status] || "#666";
+
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="background-color:${color}; width:16px; height:16px; border-radius:50%; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>`,
+          iconSize: [16, 16],
+        });
+
+        // Popup only shows category + status — no description or reporter
+        // info, since this map is public and unauthenticated
+        L.marker([report.latitude, report.longitude], { icon })
+          .addTo(map)
+          .bindPopup(`<strong>${report.category}</strong><br>Status: ${report.status.replace("_", " ")}`);
+      });
+    });
+}
+
+// The public map loads immediately, since it's visible on page load
+// (unlike the admin map, which only loads once "Map View" is clicked)
+initPublicMap();

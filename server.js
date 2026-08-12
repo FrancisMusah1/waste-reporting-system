@@ -131,6 +131,17 @@ app.get("/my-reports", requireAuth, async (req, res) => {
   res.json(result.rows);
 });
 
+
+// page map (category, status, coordinates) — deliberately NOT reporter
+app.get("/public-reports", async (req, res) => {
+  const result = await pool.query(
+    "SELECT category, status, latitude, longitude FROM reports WHERE latitude IS NOT NULL"
+  );
+
+  res.json(result.rows);
+});
+
+
 app.patch("/reports/:id/status", requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -151,6 +162,9 @@ app.patch("/reports/:id/status", requireAuth, requireAdmin, async (req, res) => 
 
   res.json({ message: "Status updated!", report: result.rows[0] });
 });
+
+
+
 
 // Citizen or admin requests a password reset by submitting their email.
 // We generate a random token, store it with a 1-hour expiry, and email
