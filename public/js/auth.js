@@ -5,6 +5,50 @@ const showSignup = document.getElementById("showSignup");
 const showLogin = document.getElementById("showLogin");
 const errorBox = document.getElementById("auth-error");
 
+
+// FORGOT PASSWORD FORM TOGGLE
+// Shows the forgot-password form in place of login/signup, and back again.
+
+
+const forgotForm = document.getElementById("forgot-form");
+
+document.getElementById("showForgotPassword").addEventListener("click", (e) => {
+  e.preventDefault();
+  loginForm.classList.add("d-none");
+  forgotForm.classList.remove("d-none");
+});
+
+document.getElementById("backToLoginFromForgot").addEventListener("click", (e) => {
+  e.preventDefault();
+  forgotForm.classList.add("d-none");
+  loginForm.classList.remove("d-none");
+});
+
+
+// FORGOT PASSWORD SUBMISSION
+// Sends the entered email to the backend, which emails a reset link
+// if an account with that email exists.
+
+
+document.getElementById("forgotForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  hideError();
+
+  const email = document.getElementById("forgotEmail").value;
+
+  const response = await fetch(`${API_URL}/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+
+  // Always show the same message, whether or not the email exists —
+  // matches the backend's deliberate vagueness for security reasons
+  showError(data.message);
+});
+
 // References to the two main "views" on the landing page:
 // landingView = hero section + how-it-works (shown by default)
 // authView = login/signup forms (hidden until "Get Started" is clicked)
