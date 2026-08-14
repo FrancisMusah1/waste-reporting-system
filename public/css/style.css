@@ -362,3 +362,23 @@
      margin-top: 4px;
      color: var(--text-muted);
    }
+
+   /* 
+   MOBILE HEADER SPACING
+    */
+
+@media (max-width: 500px) {
+  .navbar .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .navbar .d-flex,
+  .navbar > .container > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
