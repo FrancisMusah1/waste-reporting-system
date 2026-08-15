@@ -107,7 +107,26 @@ app.post("/reports", requireAuth, upload.single("photo"), async (req, res) => {
   res.json({ message: "Report submitted!", report: result.rows[0] });
 });
 
+// Guest reporting: allows anyone to submit a report WITHOUT an account.
+// No requireAuth here — user_id is simply left null, since there's no
+// logged-in user to attach it to.
+app.post("/reports/guest", upload.fields([
+  { name: "photo", maxCount: 1 },
+  { name: "audio", maxCount: 1 },
+]), async (req, res) => {
+  const { category, description, location, latitude, longitude } = req.body;
 
+  const photoUrl = req.files?.photo?.[0]?.path || null;
+  const audioUrl = req.files?.audio?.[0]?.path || null;
+
+  const result = await pool.query(
+    `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url)
+     VALUES (NULL, $1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [category, description, location, latitude || null, longitude || null, photoUrl, audioUrl]
+  );
+
+  res.json({ message: "Report submitted!", report: result.rows[0] });
+});
 
 app.get("/reports", requireAuth, requireAdmin, async (req, res) => {
   const result = await pool.query(
