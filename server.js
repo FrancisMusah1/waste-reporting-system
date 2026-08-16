@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const { Resend } = require("resend");
 const crypto = require("crypto");
-const upload = require("./cloudinary");
+const { upload, uploadWithAudio } = require("./cloudinary");
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
@@ -108,24 +108,28 @@ app.post("/reports", requireAuth, upload.single("photo"), async (req, res) => {
 });
 
 // Guest reporting: allows anyone to submit a report WITHOUT an account.
-// No requireAuth here — user_id is simply left null, since there's no
-// logged-in user to attach it to.
-app.post("/reports/guest", upload.fields([
+// No requireAuth here 
+app.post("/reports/guest", uploadWithAudio.fields([
   { name: "photo", maxCount: 1 },
   { name: "audio", maxCount: 1 },
 ]), async (req, res) => {
-  const { category, description, location, latitude, longitude } = req.body;
+  try {
+    const { category, description, location, latitude, longitude } = req.body;
 
-  const photoUrl = req.files?.photo?.[0]?.path || null;
-  const audioUrl = req.files?.audio?.[0]?.path || null;
+    const photoUrl = req.files?.photo?.[0]?.path || null;
+    const audioUrl = req.files?.audio?.[0]?.path || null;
 
-  const result = await pool.query(
-    `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url)
-     VALUES (NULL, $1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [category, description, location, latitude || null, longitude || null, photoUrl, audioUrl]
-  );
+    const result = await pool.query(
+      `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url)
+       VALUES (NULL, $1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [category, description, location, latitude || null, longitude || null, photoUrl, audioUrl]
+    );
 
-  res.json({ message: "Report submitted!", report: result.rows[0] });
+    res.json({ message: "Report submitted!", report: result.rows[0] });
+  } catch (err) {
+    console.error("Guest report submission error:", err);
+    res.status(500).json({ message: "Failed to submit report. Please try again." });
+  }
 });
 
 app.get("/reports", requireAuth, requireAdmin, async (req, res) => {

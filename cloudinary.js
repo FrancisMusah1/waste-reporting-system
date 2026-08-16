@@ -9,7 +9,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
+// Storage config specifically for photo evidence
+const photoStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "waste-reports",
@@ -17,6 +18,37 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage });
+// Separate storage config for voice notes 
+const audioStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "waste-reports-audio",
+    resource_type: "video",
+    allowed_formats: ["m4a", "mp3", "wav", "aac"],
+  },
+});
 
-module.exports = upload;
+const upload = multer({ storage: photoStorage });
+
+// A second multer instance, specifically for routes that accept both
+// a photo AND an audio file together (like guest reporting)
+const uploadWithAudio = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: (req, file) => {
+      if (file.fieldname === "audio") {
+        return {
+          folder: "waste-reports-audio",
+          resource_type: "video",
+          allowed_formats: ["m4a", "mp3", "wav", "aac"],
+        };
+      }
+      return {
+        folder: "waste-reports",
+        allowed_formats: ["jpg", "jpeg", "png"],
+      };
+    },
+  }),
+});
+
+module.exports = { upload, uploadWithAudio };
