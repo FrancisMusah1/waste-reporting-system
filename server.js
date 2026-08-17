@@ -112,17 +112,19 @@ app.post("/reports", requireAuth, upload.single("photo"), async (req, res) => {
 app.post("/reports/guest", uploadWithAudio.fields([
   { name: "photo", maxCount: 1 },
   { name: "audio", maxCount: 1 },
+  { name: "video", maxCount: 1 },
 ]), async (req, res) => {
   try {
     const { category, description, location, latitude, longitude } = req.body;
 
     const photoUrl = req.files?.photo?.[0]?.path || null;
     const audioUrl = req.files?.audio?.[0]?.path || null;
+    const videoUrl = req.files?.video?.[0]?.path || null;
 
     const result = await pool.query(
-      `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url)
-       VALUES (NULL, $1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [category, description, location, latitude || null, longitude || null, photoUrl, audioUrl]
+      `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url, video_url)
+       VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [category, description, location, latitude || null, longitude || null, photoUrl, audioUrl, videoUrl]
     );
 
     res.json({ message: "Report submitted!", report: result.rows[0] });
