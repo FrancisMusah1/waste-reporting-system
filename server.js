@@ -8,6 +8,10 @@ const cors = require("cors");
 const pool = require("./db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { getRankForPoints } = require("./ranks");
+
+const SUBMIT_POINTS = 10;
+const RESOLUTION_POINTS = 40;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -111,6 +115,10 @@ app.post("/reports", requireAuth, uploadWithAudio.fields([
       [userId, category, description, location, latitude || null, longitude || null, photoUrl, audioUrl, videoUrl]
     );
 
+    // Award partial points for submitting — only once per report
+    await pool.query("UPDATE users SET points = points + $1 WHERE id = $2", [SUBMIT_POINTS, userId]);
+    await pool.query("UPDATE reports SET submit_points_awarded = TRUE WHERE id = $1", [result.rows[0].id]);
+
     res.json({ message: "Report submitted!", report: result.rows[0] });
   } catch (err) {
     console.error("Report submission error:", err);
@@ -167,6 +175,27 @@ app.get("/my-reports", requireAuth, async (req, res) => {
   res.json(result.rows);
 });
 
+// Logged-in user's own points + rank badge
+app.get("/me", requireAuth, async (req, res) => {
+  const result = await pool.query("SELECT id, name, points FROM users WHERE id = $1", [req.user.userId]);
+  const user = result.rows[0];
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const rank = getRankForPoints(user.points);
+  res.json({ id: user.id, name: user.name, points: user.points, rank: rank.name, rankEmoji: rank.emoji });
+});
+
+// Public leaderboard — top 20 registered users
+app.get("/leaderboard", async (req, res) => {
+  const result = await pool.query("SELECT name, points FROM users ORDER BY points DESC LIMIT 20");
+
+  const leaderboard = result.rows.map((u, i) => {
+    const rank = getRankForPoints(u.points);
+    return { position: i + 1, name: u.name, points: u.points, rankName: rank.name, rankEmoji: rank.emoji };
+  });
+
+  res.json(leaderboard);
+});
 
 // page map (category, status, coordinates) — deliberately NOT reporter
 app.get("/public-reports", async (req, res) => {
@@ -196,7 +225,15 @@ app.patch("/reports/:id/status", requireAuth, requireAdmin, async (req, res) => 
     return res.status(404).json({ message: "Report not found" });
   }
 
-  res.json({ message: "Status updated!", report: result.rows[0] });
+  const report = result.rows[0];
+
+  // Award resolution points once, and only to registered users (guests have no user_id)
+  if (status === "resolved" && report.user_id && !report.resolution_points_awarded) {
+    await pool.query("UPDATE users SET points = points + $1 WHERE id = $2", [RESOLUTION_POINTS, report.user_id]);
+    await pool.query("UPDATE reports SET resolution_points_awarded = TRUE WHERE id = $1", [id]);
+  }
+
+  res.json({ message: "Status updated!", report });
 });
 
 
