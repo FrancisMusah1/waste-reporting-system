@@ -92,19 +92,30 @@ app.post("/login", async (req, res) => {
   });
 });
 
-app.post("/reports", requireAuth, upload.single("photo"), async (req, res) => {
-  const { category, description, location, latitude, longitude } = req.body;
-  const userId = req.user.userId;
+app.post("/reports", requireAuth, uploadWithAudio.fields([
+  { name: "photo", maxCount: 1 },
+  { name: "audio", maxCount: 1 },
+  { name: "video", maxCount: 1 },
+]), async (req, res) => {
+  try {
+    const { category, description, location, latitude, longitude } = req.body;
+    const userId = req.user.userId;
 
-  const photoUrl = req.file ? req.file.path : null;
+    const photoUrl = req.files?.photo?.[0]?.path || null;
+    const audioUrl = req.files?.audio?.[0]?.path || null;
+    const videoUrl = req.files?.video?.[0]?.path || null;
 
-  const result = await pool.query(
-    `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [userId, category, description, location, latitude || null, longitude || null, photoUrl]
-  );
+    const result = await pool.query(
+      `INSERT INTO reports (user_id, category, description, location, latitude, longitude, photo_url, audio_url, video_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [userId, category, description, location, latitude || null, longitude || null, photoUrl, audioUrl, videoUrl]
+    );
 
-  res.json({ message: "Report submitted!", report: result.rows[0] });
+    res.json({ message: "Report submitted!", report: result.rows[0] });
+  } catch (err) {
+    console.error("Report submission error:", err);
+    res.status(500).json({ message: "Failed to submit report. Please try again." });
+  }
 });
 
 // Guest reporting: allows anyone to submit a report WITHOUT an account.
