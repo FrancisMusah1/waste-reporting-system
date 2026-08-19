@@ -9,7 +9,6 @@ if (!token || !user) {
 }
 
 // Logged in, but NOT an admin -> send them to the citizen page instead
-// (they shouldn't even see this page exist)
 if (user.role !== "admin") {
   window.location.href = "/citizen.html";
 }
@@ -86,11 +85,14 @@ function renderReports(reports) {
             </p>
             ${audioHtml}
             <span class="badge bg-${badgeColor} mb-2 mt-2">${report.status.replace("_", " ")}</span>
-            <select class="form-select status-select" data-report-id="${report.id}">
+            <select class="form-select status-select mb-2" data-report-id="${report.id}">
               <option value="pending" ${report.status === "pending" ? "selected" : ""}>Pending</option>
               <option value="in_progress" ${report.status === "in_progress" ? "selected" : ""}>In Progress</option>
               <option value="resolved" ${report.status === "resolved" ? "selected" : ""}>Resolved</option>
             </select>
+            <button class="btn btn-outline-danger btn-sm w-100 delete-btn" data-report-id="${report.id}">
+              Delete Report
+            </button>
           </div>
         </div>
       `;
@@ -101,13 +103,18 @@ function renderReports(reports) {
     document.querySelectorAll(".status-select").forEach((select) => {
       select.addEventListener("change", handleStatusChange);
     });
+
+    // Attach a click-listener to every delete button just created
+    document.querySelectorAll(".delete-btn").forEach((button) => {
+      button.addEventListener("click", handleDeleteClick);
+    });
   }
 
   // Called whenever an admin changes a report's status dropdown.
 // Sends the new status to the backend, then refreshes the dashboard
 // so the stats and badge colors stay accurate.
 async function handleStatusChange(e) {
-    const reportId = e.target.dataset.reportId; // read the data-report-id attribute
+    const reportId = e.target.dataset.reportId;
     const newStatus = e.target.value;
 
     const response = await fetch(`${API_URL}/reports/${reportId}/status`, {
@@ -125,6 +132,31 @@ async function handleStatusChange(e) {
     }
 
     // Reload everything so stats and badges reflect the change immediately
+    loadReports();
+  }
+
+  // Called when an admin clicks "Delete Report" on a card. Confirms
+  // first (this is permanent and also removes the Cloudinary media),
+  // then calls the DELETE endpoint and refreshes the dashboard.
+  async function handleDeleteClick(e) {
+    const reportId = e.target.dataset.reportId;
+
+    const confirmed = confirm(
+      "Delete this report permanently? This will also remove its photo/audio/video from storage. This cannot be undone."
+    );
+    if (!confirmed) return;
+
+    const response = await fetch(`${API_URL}/reports/${reportId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      alert("Failed to delete report");
+      return;
+    }
+
+   
     loadReports();
   }
 
@@ -237,6 +269,7 @@ document.getElementById("showMapBtn").addEventListener("click", () => {
   document.getElementById("showListBtn").classList.replace("btn-primary", "btn-outline-primary");
 
   // Leaflet needs to recalculate its size after becoming visible,
+  // since it can't measure a hidden (display:none) container correctly
   plotReportsOnMap(allReports);
   setTimeout(() => map.invalidateSize(), 100);
 });

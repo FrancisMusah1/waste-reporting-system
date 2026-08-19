@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const { Resend } = require("resend");
 const crypto = require("crypto");
+const { v2: cloudinary } = require("cloudinary");
 const { upload, uploadWithAudio } = require("./cloudinary");
 const express = require("express");
 const cors = require("cors");
@@ -39,6 +40,18 @@ function requireAdmin(req, res, next) {
     return res.status(403).json({ message: "Admin access required" });
   }
   next();
+}
+
+// Extracts the Cloudinary public_id from a stored URL, so we can tell
+// Cloudinary exactly which file to delete. Cloudinary URLs look like:
+// https://res.cloudinary.com/<cloud>/image/upload/v12345/folder/name.jpg
+// and the public_id is "folder/name" (folder included, no extension).
+function extractPublicId(url) {
+  if (!url) return null;
+  const parts = url.split("/upload/")[1]; // "v12345/folder/name.jpg"
+  if (!parts) return null;
+  const withoutVersion = parts.replace(/^v\d+\//, ""); // "folder/name.jpg"
+  return withoutVersion.replace(/\.[^/.]+$/, ""); // "folder/name"
 }
 
 const app = express();
@@ -236,8 +249,43 @@ app.patch("/reports/:id/status", requireAuth, requireAdmin, async (req, res) => 
   res.json({ message: "Status updated!", report });
 });
 
+// Admin-only: permanently deletes a report and its associated Cloudinary
+// media (photo/audio/video, whichever exist). Used for removing
+// duplicate or invalid reports.
+app.delete("/reports/:id", requireAuth, requireAdmin, async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const result = await pool.query("SELECT * FROM reports WHERE id = $1", [id]);
+    const report = result.rows[0];
 
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    // Best-effort cleanup of associated Cloudinary media. If a delete
+    // fails we log it but still proceed with
+    const mediaUrls = [report.photo_url, report.audio_url, report.video_url];
+    for (const url of mediaUrls) {
+      const publicId = extractPublicId(url);
+      if (!publicId) continue;
+
+      const resourceType = url === report.photo_url ? "image" : "video"; // audio/video both use "video" per your Cloudinary config
+      try {
+        await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+      } catch (cloudErr) {
+        console.error(`Failed to delete Cloudinary asset ${publicId}:`, cloudErr);
+      }
+    }
+
+    await pool.query("DELETE FROM reports WHERE id = $1", [id]);
+
+    res.json({ message: "Report deleted." });
+  } catch (err) {
+    console.error("Delete report error:", err);
+    res.status(500).json({ message: "Failed to delete report. Please try again." });
+  }
+});
 
 // Citizen or admin requests a password reset by submitting their email.
 // We generate a random token, store it with a 1-hour expiry, and email
