@@ -47,32 +47,45 @@ function updateStats() {
 function renderReports(reports) {
     const container = document.getElementById("reportsList");
     container.innerHTML = "";
-  
+
     if (reports.length === 0) {
       container.innerHTML = `<p class="text-muted">No reports match your filters.</p>`;
       return;
     }
-  
+
     const statusColors = {
       pending: "warning",
       in_progress: "info",
       resolved: "success",
     };
-  
+
     reports.forEach((report) => {
       const badgeColor = statusColors[report.status] || "secondary";
-  
+      const reporterLabel = report.reporter_name || "Guest";
+      const reporterBadgeClass = report.reporter_name ? "bg-secondary" : "bg-dark";
+
+      const mediaHtml = report.video_url
+        ? `<video src="${report.video_url}" class="card-img-top" style="height: 180px; object-fit: cover;" controls></video>`
+        : `<img src="${report.photo_url}" class="card-img-top" style="height: 180px; object-fit: cover;">`;
+
+      const audioHtml = report.audio_url
+        ? `<audio src="${report.audio_url}" controls style="width: 100%; margin-top: 8px;"></audio>`
+        : "";
+
       const card = document.createElement("div");
       card.className = "col-md-4 mb-4";
       card.innerHTML = `
         <div class="card h-100">
-          <img src="${report.photo_url}" class="card-img-top" style="height: 180px; object-fit: cover;">
+          ${mediaHtml}
           <div class="card-body">
             <h5 class="card-title">${report.category}</h5>
             <p class="card-text">${report.description}</p>
             <p class="card-text"><small class="text-muted">${report.location}</small></p>
-            <p class="card-text"><small class="text-muted">Reported by: ${report.reporter_name}</small></p>
-            <span class="badge bg-${badgeColor} mb-2">${report.status.replace("_", " ")}</span>
+            <p class="card-text">
+              <span class="badge ${reporterBadgeClass}">${reporterLabel}</span>
+            </p>
+            ${audioHtml}
+            <span class="badge bg-${badgeColor} mb-2 mt-2">${report.status.replace("_", " ")}</span>
             <select class="form-select status-select" data-report-id="${report.id}">
               <option value="pending" ${report.status === "pending" ? "selected" : ""}>Pending</option>
               <option value="in_progress" ${report.status === "in_progress" ? "selected" : ""}>In Progress</option>
@@ -83,7 +96,7 @@ function renderReports(reports) {
       `;
       container.appendChild(card);
     });
-  
+
     // Attach a change-listener to every status dropdown just created
     document.querySelectorAll(".status-select").forEach((select) => {
       select.addEventListener("change", handleStatusChange);
@@ -96,7 +109,7 @@ function renderReports(reports) {
 async function handleStatusChange(e) {
     const reportId = e.target.dataset.reportId; // read the data-report-id attribute
     const newStatus = e.target.value;
-  
+
     const response = await fetch(`${API_URL}/reports/${reportId}/status`, {
       method: "PATCH",
       headers: {
@@ -105,12 +118,12 @@ async function handleStatusChange(e) {
       },
       body: JSON.stringify({ status: newStatus }),
     });
-  
+
     if (!response.ok) {
       alert("Failed to update status");
       return;
     }
-  
+
     // Reload everything so stats and badges reflect the change immediately
     loadReports();
   }
@@ -121,29 +134,29 @@ function applyFilters() {
     const searchText = document.getElementById("searchInput").value.toLowerCase();
     const statusValue = document.getElementById("statusFilter").value;
     const categoryValue = document.getElementById("categoryFilter").value;
-  
+
     const filtered = allReports.filter((report) => {
       const matchesSearch =
         report.description.toLowerCase().includes(searchText) ||
         report.location.toLowerCase().includes(searchText);
       const matchesStatus = statusValue === "" || report.status === statusValue;
       const matchesCategory = categoryValue === "" || report.category === categoryValue;
-  
+
       return matchesSearch && matchesStatus && matchesCategory;
     });
-  
+
     renderReports(filtered);
   }
-  
+
   // Re-run filtering every time the admin types in search or changes a dropdown
   document.getElementById("searchInput").addEventListener("input", applyFilters);
   document.getElementById("statusFilter").addEventListener("change", applyFilters);
   document.getElementById("categoryFilter").addEventListener("change", applyFilters);
-  
+
   // Load everything as soon as the page opens
   loadReports();
 
-  
+
 // MAP VIEW
 // Plots every report on an interactive map using Leaflet.js, with pin
 
@@ -224,7 +237,6 @@ document.getElementById("showMapBtn").addEventListener("click", () => {
   document.getElementById("showListBtn").classList.replace("btn-primary", "btn-outline-primary");
 
   // Leaflet needs to recalculate its size after becoming visible,
-  // since it can't measure a hidden (display:none) container correctly
   plotReportsOnMap(allReports);
   setTimeout(() => map.invalidateSize(), 100);
 });

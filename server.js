@@ -157,7 +157,7 @@ app.get("/reports", requireAuth, requireAdmin, async (req, res) => {
   const result = await pool.query(
     `SELECT reports.*, users.name AS reporter_name
      FROM reports
-     JOIN users ON reports.user_id = users.id
+     LEFT JOIN users ON reports.user_id = users.id
      ORDER BY reports.created_at DESC`
   );
 
