@@ -382,3 +382,44 @@
     align-items: center;
   }
 }
+
+/* 
+   REPORTER BADGE
+    */
+
+    .badge.bg-dark {
+      background-color: var(--forest-green-dark) !important;
+      font-weight: 600;
+      padding: 6px 12px;
+    }
+    
+    .badge.bg-secondary {
+      background-color: var(--leaf-green) !important;
+      color: white;
+      font-weight: 600;
+      padding: 6px 12px;
+    }
+    
+    /* 
+       INLINE AUDIO PLAYER (voice note playback on report cards)
+        */
+    
+    #reportsList audio {
+      border-radius: 8px;
+      background-color: var(--bg-light);
+    }
+    
+    /* 
+       DELETE REPORT BUTTON
+        */
+    
+    .delete-btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    
+    .delete-btn:hover {
+      background-color: #dc3545;
+      color: white;
+    }
