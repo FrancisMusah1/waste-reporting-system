@@ -9,6 +9,7 @@ if (!token || !user) {
 }
 
 // Logged in, but NOT an admin -> send them to the citizen page instead
+// (they shouldn't even see this page exist)
 if (user.role !== "admin") {
   window.location.href = "/citizen.html";
 }
@@ -62,6 +63,7 @@ function renderReports(reports) {
       const badgeColor = statusColors[report.status] || "secondary";
       const reporterLabel = report.reporter_name || "Guest";
       const reporterBadgeClass = report.reporter_name ? "bg-secondary" : "bg-dark";
+      const categoryLabel = report.category || "Uncategorized";
 
       const mediaHtml = report.video_url
         ? `<video src="${report.video_url}" class="card-img-top" style="height: 180px; object-fit: cover;" controls></video>`
@@ -71,15 +73,23 @@ function renderReports(reports) {
         ? `<audio src="${report.audio_url}" controls style="width: 100%; margin-top: 8px;"></audio>`
         : "";
 
+      const descriptionHtml = report.description
+        ? `<p class="card-text">${report.description}</p>`
+        : "";
+
+      const locationHtml = report.location
+        ? `<p class="card-text"><small class="text-muted">${report.location}</small></p>`
+        : "";
+
       const card = document.createElement("div");
       card.className = "col-md-4 mb-4";
       card.innerHTML = `
         <div class="card h-100">
           ${mediaHtml}
           <div class="card-body">
-            <h5 class="card-title">${report.category}</h5>
-            <p class="card-text">${report.description}</p>
-            <p class="card-text"><small class="text-muted">${report.location}</small></p>
+            <h5 class="card-title">${categoryLabel}</h5>
+            ${descriptionHtml}
+            ${locationHtml}
             <p class="card-text">
               <span class="badge ${reporterBadgeClass}">${reporterLabel}</span>
             </p>
@@ -114,7 +124,7 @@ function renderReports(reports) {
 // Sends the new status to the backend, then refreshes the dashboard
 // so the stats and badge colors stay accurate.
 async function handleStatusChange(e) {
-    const reportId = e.target.dataset.reportId;
+    const reportId = e.target.dataset.reportId; // read the data-report-id attribute
     const newStatus = e.target.value;
 
     const response = await fetch(`${API_URL}/reports/${reportId}/status`, {
@@ -156,7 +166,7 @@ async function handleStatusChange(e) {
       return;
     }
 
-   
+    // Reload everything so stats and the list reflect the deletion immediately
     loadReports();
   }
 
@@ -169,8 +179,8 @@ function applyFilters() {
 
     const filtered = allReports.filter((report) => {
       const matchesSearch =
-        report.description.toLowerCase().includes(searchText) ||
-        report.location.toLowerCase().includes(searchText);
+        (report.description || "").toLowerCase().includes(searchText) ||
+        (report.location || "").toLowerCase().includes(searchText);
       const matchesStatus = statusValue === "" || report.status === statusValue;
       const matchesCategory = categoryValue === "" || report.category === categoryValue;
 
@@ -228,6 +238,8 @@ function plotReportsOnMap(reports) {
 
     const color = statusColors[report.status] || "#666";
 
+    const categoryLabel = report.category || "Uncategorized";
+
 
     // default blue pin — keeps the map visually consistent with the
     // status badges used elsewhere in the dashboard
@@ -241,9 +253,9 @@ function plotReportsOnMap(reports) {
 
     // Popup content shown when the pin is clicked
     marker.bindPopup(`
-      <strong>${report.category}</strong><br>
-      ${report.description}<br>
-      <small class="text-muted">${report.location}</small><br>
+      <strong>${categoryLabel}</strong><br>
+      ${report.description || ""}<br>
+      <small class="text-muted">${report.location || ""}</small><br>
       <span class="badge" style="background-color:${color};">${report.status.replace("_", " ")}</span>
     `);
 
@@ -269,7 +281,6 @@ document.getElementById("showMapBtn").addEventListener("click", () => {
   document.getElementById("showListBtn").classList.replace("btn-primary", "btn-outline-primary");
 
   // Leaflet needs to recalculate its size after becoming visible,
-  // since it can't measure a hidden (display:none) container correctly
   plotReportsOnMap(allReports);
   setTimeout(() => map.invalidateSize(), 100);
 });
