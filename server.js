@@ -59,6 +59,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
+// Lightweight endpoint with no auth or DB queries — used to "warm up"
+// Render before a demo, since the free tier spins down after idle time.
+app.get("/health", (req, res) => res.status(200).send("ok"));
+
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
 
